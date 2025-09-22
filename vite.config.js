@@ -12,5 +12,9 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  esbuild: {
+    loader: 'jsx',
+    include: /src\/.*\.js$/,
   }
 });
