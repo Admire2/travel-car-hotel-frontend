@@ -1,3 +1,18 @@
+# === Git presence check ===
+if (-not (Get-Command git.exe -ErrorAction SilentlyContinue)) {
+    Write-Host "⚠ Git not found in PATH. Attempting to locate..." -ForegroundColor Yellow
+    $possiblePath = "C:\Program Files\Git\cmd\git.exe"
+    if (Test-Path $possiblePath) {
+        $env:Path += ";C:\Program Files\Git\cmd"
+        Write-Host "✅ Git found and added to PATH for this session." -ForegroundColor Green
+    }
+    else {
+        Write-Host "❌ Git not installed or not found. Please install from https://git-scm.com/download/win" -ForegroundColor Red
+        exit 1
+    }
+}
+Write-Host "✅ Git version: $(git --version)" -ForegroundColor Green
+
 param(
     [string]$GitHubUser,
     [string]$RepoName,
@@ -42,10 +57,12 @@ try {
     $resp = Invoke-WebRequest -Uri "http://localhost:4002" -UseBasicParsing -TimeoutSec 3
     if ($resp.StatusCode -eq 200) {
         Write-Host "✅ Backend is responding."
-    } else {
+    }
+    else {
         throw
     }
-} catch {
+}
+catch {
     Write-Host "⚠ Backend not responding on port 4002." -ForegroundColor Yellow
     if ($BackendCmd) {
         Write-Host "🚀 Starting backend with: $BackendCmd"
@@ -55,13 +72,16 @@ try {
             $resp = Invoke-WebRequest -Uri "http://localhost:4002" -UseBasicParsing -TimeoutSec 3
             if ($resp.StatusCode -eq 200) {
                 Write-Host "✅ Backend started successfully."
-            } else {
+            }
+            else {
                 Write-Host "❌ Backend still not responding. Proceeding, but proxy may fail." -ForegroundColor Red
             }
-        } catch {
+        }
+        catch {
             Write-Host "❌ Backend still not responding. Proceeding, but proxy may fail." -ForegroundColor Red
         }
-    } else {
+    }
+    else {
         Write-Host "ℹ No backend start command provided. Skipping auto-start."
     }
 }

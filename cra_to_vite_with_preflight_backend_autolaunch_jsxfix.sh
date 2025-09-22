@@ -1,3 +1,15 @@
+# === Git presence check ===
+if ! command -v git >/dev/null 2>&1; then
+  echo "⚠ Git not found in PATH. Attempting to locate..."
+  if [ -x "/c/Program Files/Git/cmd/git.exe" ]; then
+    export PATH="$PATH:/c/Program Files/Git/cmd"
+    echo "✅ Git found and added to PATH for this session."
+  else
+    echo "❌ Git not installed or not found. Please install from https://git-scm.com/download/win"
+    exit 1
+  fi
+fi
+echo "✅ Git version: $(git --version)"
 #!/bin/bash
 # Usage: ./cra_to_vite_with_preflight_backend_autolaunch_jsxfix.sh <github-username> <repo-name> [backend-start-command]
 
