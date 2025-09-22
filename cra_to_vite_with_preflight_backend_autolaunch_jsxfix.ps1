@@ -1,3 +1,34 @@
+
+# === GitHub remote reachability check ===
+if (-not (Get-Command git.exe -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ Git not found. Please install Git for Windows." -ForegroundColor Red
+    exit 1
+}
+
+try {
+    git rev-parse --is-inside-work-tree | Out-Null
+}
+catch {
+    Write-Host "❌ Not inside a Git repository." -ForegroundColor Red
+    exit 1
+}
+
+$remoteUrl = git remote get-url origin 2>$null
+if (-not $remoteUrl) {
+    Write-Host "❌ No 'origin' remote found. Please set one with: git remote add origin <url>" -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "🔍 Checking remote reachability..." -ForegroundColor Yellow
+try {
+    git ls-remote $remoteUrl | Out-Null
+    Write-Host "✅ Remote reachable: $remoteUrl" -ForegroundColor Green
+}
+catch {
+    Write-Host "❌ Cannot reach remote: $remoteUrl" -ForegroundColor Red
+    exit 1
+}
+
 # === Git presence check ===
 if (-not (Get-Command git.exe -ErrorAction SilentlyContinue)) {
     Write-Host "⚠ Git not found in PATH. Attempting to locate..." -ForegroundColor Yellow
@@ -118,7 +149,7 @@ Write-Host "=== MIGRATION: CRA → Vite ==="
 npm uninstall react-scripts
 npm install --save-dev vite @vitejs/plugin-react
 
-# Create fixed vite.config.js
+# === Create fixed vite.config.js with JSX loader and updated port ===
 @"
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -137,18 +168,31 @@ export default defineConfig({
   },
   esbuild: {
     loader: 'jsx',
-    include: /src\\/.*\\.js$/,
+    include: /src\/.*\.js$/, // Treat all .js files in src as JSX
   }
 });
 "@ | Out-File -Encoding utf8 vite.config.js
 
-# Remove extra HTML files except root index.html
-Get-ChildItem -Recurse -Include *.html | Where-Object { $_.FullName -ne (Join-Path (Get-Location) "index.html") } | Remove-Item -Force
+# === Remove extra HTML files except root index.html ===
+Get-ChildItem -Recurse -Include *.html |
+Where-Object { $_.FullName -ne (Join-Path (Get-Location) "index.html") } |
+Remove-Item -Force
+Write-Host "✅ vite.config.js updated and extra HTML files cleaned up" -ForegroundColor Green
 
-# Update package.json scripts
-npx npm-check-updates -u
-npm install
-npx json -I -f package.json -e 'this.scripts={"dev":"vite","build":"vite build","preview":"vite preview"}'
+# === Update package.json scripts (PowerShell native) ===
+if (Test-Path "package.json") {
+    $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+    $pkg.scripts = @{
+        dev     = "vite"
+        build   = "vite build"
+        preview = "vite preview"
+    }
+    $pkg | ConvertTo-Json -Depth 10 | Set-Content package.json -Encoding UTF8
+    Write-Host "✅ package.json scripts updated for Vite" -ForegroundColor Green
+}
+else {
+    Write-Host "⚠ package.json not found — skipping script update" -ForegroundColor Yellow
+}
 
 # === STEP 3: Post‑migration snapshot ===
 Write-Host "=== SNAPSHOT: Post‑migration ==="
