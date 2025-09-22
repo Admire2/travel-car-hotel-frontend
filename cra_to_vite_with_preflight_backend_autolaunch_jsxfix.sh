@@ -105,7 +105,7 @@ echo "=== MIGRATION: CRA → Vite ==="
 npm uninstall react-scripts
 npm install --save-dev vite @vitejs/plugin-react
 
-# Create fixed vite.config.js with JSX loader
+# Create fixed vite.config.js with JSX loader and updated port
 cat > vite.config.js <<EOL
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -124,13 +124,15 @@ export default defineConfig({
   },
   esbuild: {
     loader: 'jsx',
-    include: /src\\/.*\\.js$/,
+    include: /src\\/.*\\.js$/, // Treat all .js files in src as JSX
   }
 });
 EOL
 
 # Remove extra HTML files except root index.html
 find . -type f -name "*.html" ! -path "./index.html" -delete
+echo "✅ vite.config.js updated and extra HTML files cleaned up"
+
 
 # Update package.json scripts
 npx npm-check-updates -u
