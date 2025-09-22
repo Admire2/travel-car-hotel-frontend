@@ -1,0 +1,1 @@
+Material UI components are already responsive. TailwindCSS utility classes can be added for further customization. See README_TAILWIND_SETUP.txt for setup steps.
