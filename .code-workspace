@@ -1,0 +1,11 @@
+{
+    // VS Code workspace settings to always open the integrated terminal in the correct project folder
+    "folders": [
+        {
+            "path": "C:\\Users\\great\\Documents\\AI_Projects\\Travel-Car&Hotel-Reservation-App"
+        }
+    ],
+    "settings": {
+        "terminal.integrated.cwd": "C:\\Users\\great\\Documents\\AI_Projects\\Travel-Car&Hotel-Reservation-App"
+    }
+}

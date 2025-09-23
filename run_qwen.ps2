@@ -1,0 +1,22 @@
+# Qwen Model Runner Script v2
+# Usage: .\run_qwen.ps2 -m <model_name> -p <prompt>
+param(
+    [string]$m = "",
+    [string]$p = ""
+)
+
+# Check if required parameters are provided
+if (-not $m -or -not $p) {
+    Write-Host "Usage: .\run_qwen.ps2 -m <model_name> -p <prompt>"
+    exit 1
+}
+
+# Example: Replace this with actual Qwen model invocation
+Write-Host "[v2] Running Qwen model: $m"
+Write-Host "[v2] Prompt: $p"
+
+# TODO: Add code to invoke Qwen model here
+# For example, you might call a Python script or an API
+# python run_qwen.py --model $m --prompt $p
+
+# End of script

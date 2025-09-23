@@ -1,0 +1,22 @@
+param (
+    [string]$Prompt = "Hello Qwen 3"
+)
+
+$apiKey = "sk-or-v1-3bffe2f5afb661ad7db6b48a3ac0015540ea54dee12cc0255216df54f781ab68f"
+$model = "qwen/qwen-3-coder"
+
+$body = @{
+    "model" = $model
+    "messages" = @(@{
+        "role" = "user"
+        "content" = $Prompt
+    })
+} | ConvertTo-Json -Depth 3
+
+$response = Invoke-RestMethod `
+    -Uri "https://openrouter.ai/api/v1/chat/completions" `
+    -Method Post `
+    -Headers @{ "Authorization" = "Bearer $apiKey"; "Content-Type" = "application/json" } `
+    -Body $body
+
+$response.choices[0].message.content
